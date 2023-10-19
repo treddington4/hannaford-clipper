@@ -1,32 +1,46 @@
 require 'dotenv/load'
-require 'watir'
+require 'capybara'
+require 'capybara/dsl'
+require 'selenium-webdriver'
 
-browser = Watir::Browser.new :chrome
+Capybara.register_driver :selenium do |app|
+  Capybara::Selenium::Driver.new(app, browser: :chrome)
+end
 
-browser.goto("https://www.hannaford.com/coupons")
+Capybara.default_driver = :selenium
+Capybara.run_server = false
+include Capybara::DSL
 
-# check if logged in.
-if browser.link(text: 'sign in').exists?
-  browser.link(text: 'sign in').click
-  browser.text_field(id: 'userNameLogin').set(ENV['HANNAFORD_EMAIL'])
-  browser.text_field(id: 'passwordLogin').set(ENV['HANNAFORD_PASSWORD'])
-  browser.button(text: 'Sign In').click
+visit("https://www.hannaford.com/coupons")
+
+if page.has_link?('sign in')
+  click_link('sign in')
+  fill_in('userNameLogin', with: ENV['HANNAFORD_EMAIL'])
+  fill_in('passwordLogin', with: ENV['HANNAFORD_PASSWORD'])
+  find('div#loginCred button.btn-primary').click
   sleep 5
 end
 
-# load all coupons
-loop do
-  current_height = browser.execute_script("return document.body.scrollHeight")
-  browser.execute_script("window.scrollTo(0, #{current_height});")
+if page.has_css?('#fsrFocusFirst')
+  find('#fsrFocusFirst').click
   sleep 2
-  new_height = browser.execute_script("return document.body.scrollHeight")
-  break if new_height == current_height
 end
 
-# clip all coupons
-coupon_links = browser.links(id: /clipTarget_.*/)
-coupon_links.each do |coupon_link|
-  coupon_link.click
+def scroll_to_bottom
+  execute_script("window.scrollTo(0, document.body.scrollHeight);")
 end
 
-browser.close
+while true
+  current_coupon_count = all('.clipTarget').count
+  scroll_to_bottom
+  sleep 2
+  new_coupon_count = all('.clipTarget').count
+
+  break if current_coupon_count == new_coupon_count
+end
+
+all('.clipTarget').each do |coupon|
+  coupon.click
+end
+
+Capybara.current_session.driver.quit

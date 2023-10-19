@@ -1,4 +1,5 @@
 source "https://rubygems.org"
 
 gem 'dotenv'
-gem 'watir'
+gem 'capybara'
+gem 'selenium-webdriver'

@@ -1,0 +1,25 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    dotenv (2.8.1)
+    regexp_parser (2.8.2)
+    rexml (3.2.6)
+    rubyzip (2.3.2)
+    selenium-webdriver (4.14.0)
+      rexml (~> 3.2, >= 3.2.5)
+      rubyzip (>= 1.2.2, < 3.0)
+      websocket (~> 1.0)
+    watir (7.3.0)
+      regexp_parser (>= 1.2, < 3)
+      selenium-webdriver (~> 4.2)
+    websocket (1.2.10)
+
+PLATFORMS
+  arm64-darwin-22
+
+DEPENDENCIES
+  dotenv
+  watir
+
+BUNDLED WITH
+   2.4.20

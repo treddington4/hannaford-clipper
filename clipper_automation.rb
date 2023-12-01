@@ -40,7 +40,10 @@ while true
 end
 
 all('.clipTarget').each do |coupon|
-  coupon.click
+  Capybara.using_wait_time(10) do
+    coupon.click rescue Selenium::WebDriver::Error::ElementClickInterceptedException
+  end
+  execute_script("arguments[0].click();", coupon.native) rescue Capybara::ElementNotFound
 end
 
 Capybara.current_session.driver.quit

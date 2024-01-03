@@ -35,7 +35,7 @@ begin
   while true
     current_coupon_count = all('.clipTarget').count
     scroll_to_bottom
-    sleep 2
+    sleep(0.5)
     new_coupon_count = all('.clipTarget').count
 
     break if current_coupon_count == new_coupon_count
@@ -45,6 +45,9 @@ begin
     Capybara.using_wait_time(10) do
       coupon.click rescue Selenium::WebDriver::Error::ElementClickInterceptedException
     end
+    if page.has_button?('Please try again later', type: 'submit')
+  	  click_button('Please try again later')
+  	end
     execute_script("arguments[0].click();", coupon.native) rescue Capybara::ElementNotFound
     clipped_coupons += 1
   end
@@ -60,5 +63,7 @@ begin
 rescue StandardError => e
   puts "An error occurred: #{e.message}"
 ensure
+  puts "Script completed. Press Enter to exit and close the browser..."
+	gets # Wait for user input
   Capybara.current_session.driver.quit
 end
